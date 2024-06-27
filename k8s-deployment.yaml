@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grpc-server
+  template:
+    metadata:
+      labels:
+        app: grpc-server
+    spec:
+      containers:
+      - name: grpc-server
+        image: gcr.io/second-417514/my-grpc-server
+        ports:
+        - containerPort: 50051
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apollo-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apollo-server
+  template:
+    metadata:
+      labels:
+        app: apollo-server
+    spec:
+      containers:
+      - name: apollo-server
+        image: gcr.io/second-417514/my-apollo-server
+        ports:
+        - containerPort: 4000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: react-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: react-client
+  template:
+    metadata:
+      labels:
+        app: react-client
+    spec:
+      containers:
+      - name: react-client
+        image: gcr.io/second-417514/my-react-client
+        ports:
+        - containerPort: 3000
