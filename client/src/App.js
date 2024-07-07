@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, gql } from '@apollo/client';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const GET_TASKS = gql`
   query GetTasks {
@@ -59,6 +60,7 @@ const App = () => {
 
   const handleDeleteTask = async (id) => {
     try {
+      console.log(`Deleting task with ID: ${id}`);
       await deleteTask({ variables: { id } });
       refetch();
     } catch (e) {
@@ -67,40 +69,56 @@ const App = () => {
   };
 
   return (
-    <div>
-      <h1>Task Manager</h1>
-      <input
-        type="text"
-        placeholder="Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Status"
-        value={status}
-        onChange={(e) => setStatus(e.target.value)}
-      />
-      <input
-        type="date"
-        value={dueDate}
-        onChange={(e) => setDueDate(e.target.value)}
-      />
-      <button onClick={handleCreateTask}>Create Task</button>
-      <ul>
-        {data && data.tasks && data.tasks.map((task) => (
-          <li key={task.id}>
-            {task.title} - {task.description} - {task.status} - {task.due_date ? new Date(task.due_date).toLocaleDateString() : 'No due date'}
-            <button onClick={() => handleDeleteTask(task.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+    <div className="container mt-5">
+      <h1 className="mb-4">Task Manager</h1>
+      <div className="mb-3">
+        <input
+          type="text"
+          className="form-control mb-2"
+          placeholder="Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <input
+          type="text"
+          className="form-control mb-2"
+          placeholder="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+        <input
+          type="date"
+          className="form-control mb-2"
+          placeholder="Status"
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+        />
+        <button className="btn btn-primary" onClick={handleCreateTask}>Create Task</button>
+      </div>
+      <table className="table table-striped">
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>詳細</th>
+            <th>Deadline</th>
+            <th>削除</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data && data.tasks && data.tasks.map((task) => (
+            <tr key={task.id}>
+              <td>{task.title}</td>
+              <td>{task.description}</td>
+
+              <td>{new Date(task.status).toLocaleDateString()}</td>
+
+              <td>
+                <button className="btn btn-danger" onClick={() => handleDeleteTask(task.id)}>Delete</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

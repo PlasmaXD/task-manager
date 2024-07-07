@@ -12,7 +12,7 @@ const PROTO_PATH = path.join(__dirname, 'task.proto');
 const packageDefinition = protoLoader.loadSync(PROTO_PATH, {});
 const taskProto = grpc.loadPackageDefinition(packageDefinition).task;
 
-const client = new taskProto.TaskService('grpc-server:50051', grpc.credentials.createInsecure());
+const client = new taskProto.TaskService('localhost:50051', grpc.credentials.createInsecure());
 
 const typeDefs = gql`
   type Task {
@@ -30,7 +30,7 @@ const typeDefs = gql`
   type Mutation {
     createTask(title: String!, description: String, status: String, due_date: String): Task
     updateTask(id: ID!, title: String, description: String, status: String, due_date: String): Task
-    deleteTask(id: ID!): ID
+    deleteTask(id: ID!): Task
   }
 `;
 
@@ -52,9 +52,15 @@ const resolvers = {
   },
   Mutation: {
     createTask: async (_, { title, description, status, due_date }) => {
-      console.log(`Create Task: title=${title}, description=${description}, status=${status}, due_date=${due_date}`);
+      // console.log('Received create task with due date:', due_date); due_date をログに出力
+      const task = { title, description, status, due_date };
+
       return new Promise((resolve, reject) => {
+        console.log(`Received create task with due date: ${due_date}`);
+
         const task = { title, description, status, due_date };
+        console.log("Task object to be sent to gRPC server:", task);  // 追加
+
         client.CreateTask({ task }, (error, response) => {
           if (error) {
             console.error('Error creating task:', error);
@@ -66,8 +72,8 @@ const resolvers = {
         });
       });
     },
+
     updateTask: async (_, { id, title, description, status, due_date }) => {
-      console.log(`Update Task: id=${id}, title=${title}, description=${description}, status=${status}, due_date=${due_date}`);
       return new Promise((resolve, reject) => {
         const task = { id, title, description, status, due_date };
         client.UpdateTask({ task }, (error, response) => {
@@ -82,15 +88,15 @@ const resolvers = {
       });
     },
     deleteTask: async (_, { id }) => {
-      console.log(`Delete Task: id=${id}`);
       return new Promise((resolve, reject) => {
+        console.log(`Deleting task with ID: ${id}`);
         client.DeleteTask({ id }, (error, response) => {
           if (error) {
             console.error('Error deleting task:', error);
             reject(error);
           } else {
-            console.log('Deleted task ID:', response.id);
-            resolve(response.id);
+            console.log('Deleted task with ID:', response.id);
+            resolve({ id: response.id });
           }
         });
       });

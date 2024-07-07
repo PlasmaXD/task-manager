@@ -4,7 +4,10 @@ import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client';
 import App from './App';
 
 const client = new ApolloClient({
-  uri: 'http://34.69.13.111:4000/graphql',  // ここにApollo Serverの外部IPを設定
+  //   uri: 'http://34.69.13.111:4000/graphql',  // ここにApollo Serverの外部IPを設定
+
+uri: 'http://localhost:4000/graphql' ,
+
   cache: new InMemoryCache()
 });
 
